@@ -32,6 +32,19 @@ class App extends React.Component {
   };
 
   componentDidMount() {
+    var users = localStorage.getItem("users");
+    var riftTypes = localStorage.getItem("riftTypes");
+    if (users !== null && riftTypes !== null) {
+      this.setState({
+        dataContext: {
+          ...this.state.dataContext,
+          users: JSON.parse(users),
+          riftTypes: JSON.parse(riftTypes),
+          loaded: true,
+        }
+      });
+      return;
+    }
     this.loadUsers();
   };
 
@@ -42,16 +55,15 @@ class App extends React.Component {
     axios
       .get("http://projectr.ca/slack/Friday/web/DataApi.php/user", config)
       .then(response => {
-        const data = response.data.map(c => {
-          return {
-            id: c.id,
-            name: c.name,
-            vip: c.vip,
-          };
-        });
+        const data = response.data.reduce(function (map, item) {
+          map[item.id] = item;
+          return map;
+        }, {});
         this.setState({ dataContext: { ...this.state.dataContext, users: data } });
         console.log(this.state);
         this.loadRiftTypes();
+
+        localStorage.setItem("users", JSON.stringify(data));
       })
       .catch(error => console.log(error));
   };
@@ -69,6 +81,7 @@ class App extends React.Component {
         }, {});
         this.setState({ dataContext: { ...this.state.dataContext, riftTypes: data, loaded: true } });
         console.log(this.state);
+        localStorage.setItem("riftTypes", JSON.stringify(data));
       })
       .catch(error => console.log(error));
   };

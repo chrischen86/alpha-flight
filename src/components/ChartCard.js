@@ -2,15 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
-
-
-import axios from 'axios';
-
-
-import ReactLoading from "react-loading";
-import { Doughnut } from 'react-chartjs-2';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = theme => ({
     root: {
@@ -25,6 +19,12 @@ const styles = theme => ({
     primary: {
         color: theme.palette.primary.main,
     },
+    progress: {
+        margin: theme.spacing.unit * 2,
+    },
+    card: {
+        minHeight: 300
+    }
 });
 
 class ChartCard extends React.Component {
@@ -36,12 +36,14 @@ class ChartCard extends React.Component {
 
     render() {
         const { classes } = this.props;
-
+        let children = React.Children.toArray(this.props.children);
         return (
             <React.Fragment>
-                <Card>
+                <Card raised>
+                    <CardHeader title={this.props.title} className={classes.root} titleTypographyProps={{variant:"subheading"}} />
                     <CardContent>
-                        {this.props.loaded && (<Doughnut data={this.props.data} />)}
+                        {children.length > 0 && (children[0])}
+                        {children.length <= 0 && (<CircularProgress className={classes.progress} size={100} />)}
                     </CardContent>
                 </Card>
             </React.Fragment >
